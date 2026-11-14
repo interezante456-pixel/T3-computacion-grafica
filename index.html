@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0e14">
+  <title>Operación Extracción · Videojuego FPS 3D (UPN)</title>
+  
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- MAPA DE IMPORTACIONES (Three.js versión estable idéntica al estándar del curso) -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <!-- Script principal del juego como módulo ES -->
+  <script type="module" src="main.js"></script>
+</head>
+<body>
+
+  <!-- Contenedor del lienzo 3D -->
+  <div id="game-stage"></div>
+
+  <!-- Mira táctica en el centro de la pantalla (Crosshair) -->
+  <div id="crosshair">
+    <div class="crosshair-dot"></div>
+    <div class="crosshair-line top"></div>
+    <div class="crosshair-line bottom"></div>
+    <div class="crosshair-line left"></div>
+    <div class="crosshair-line right"></div>
+  </div>
+
+  <!-- Destello de disparo (Muzzle flash overlay) -->
+  <div id="muzzle-flash"></div>
+
+  <!-- Efecto de daño visual al jugador -->
+  <div id="damage-vignette"></div>
+
+  <!-- HUD: Interfaz de usuario en pantalla -->
+  <header class="hud-top">
+    <div class="mission-info">
+      <span class="hud-tag">OPERACIÓN EXTRACCIÓN</span>
+      <h2 id="hud-status">OBJETIVO: ATRAVIESA EL BÚNKER Y LLEGA A LA EXTRACCIÓN</h2>
+    </div>
+    <div class="zombie-counter">
+      <span class="hud-label">INFECTADOS RESTANTES</span>
+      <span class="hud-value" id="zombie-count">00</span>
+    </div>
+  </header>
+
+  <footer class="hud-bottom">
+    <!-- Información de Salud y Estado -->
+    <div class="hud-card health-card">
+      <div class="hud-card-label">ESTADO DEL AGENTE</div>
+      <div class="health-bar-container">
+        <div id="health-bar" class="health-bar-fill"></div>
+      </div>
+      <div class="health-text" id="health-text">SALUD: 100%</div>
+    </div>
+
+    <!-- Notificaciones flotantes en el centro inferior -->
+    <div id="action-message" class="action-message"></div>
+
+    <!-- Información de Armamento y Municiones -->
+    <div class="hud-card weapon-card">
+      <div class="weapon-selector-hud">
+        <span id="slot-1-indicator" class="weapon-slot active">[1] PISTOLA 9MM</span>
+        <span id="slot-2-indicator" class="weapon-slot">[2] RIFLE M4</span>
+      </div>
+      <div class="ammo-display">
+        <div class="ammo-numbers">
+          <span id="current-ammo" class="ammo-current">15</span>
+          <span class="ammo-separator">/</span>
+          <span id="max-ammo" class="ammo-max">30</span>
+        </div>
+        <div class="ammo-icon">💥 BALAS / RESERVA</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- PANTALLA DE INICIO / BLOQUEO DE RATÓN -->
+  <div id="start-screen" class="overlay-screen active">
+    <div class="dialog-box">
+      <div class="badge-danger">MISIÓN DE SUPERVIVENCIA FPS 3D</div>
+      <h1>OPERACIÓN EXTRACCIÓN</h1>
+      <p class="subtitle">UPN · Computación Gráfica y Visual · Evaluación T3</p>
+      
+      <div class="story-text">
+        El complejo subterráneo ha sido infectado. Ábrete paso a través de los sectores del búnker, 
+        elimina o evade a los zombis y alcanza la <strong>Zona de Extracción</strong> final.
+      </div>
+
+      <div class="controls-guide">
+        <div class="control-col">
+          <div class="control-item"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> <span>Moverse</span></div>
+          <div class="control-item"><kbd>MOUSE</kbd> <span>Apuntar / Mirar</span></div>
+          <div class="control-item"><kbd>CLIC IZQ</kbd> <span>Disparar (1 tiro por clic)</span></div>
+        </div>
+        <div class="control-col">
+          <div class="control-item"><kbd>1</kbd> <span>Pistola Táctica</span></div>
+          <div class="control-item"><kbd>2</kbd> <span>Rifle de Asalto</span></div>
+          <div class="control-item"><kbd>R</kbd> <span>Recargar cargador</span></div>
+          <div class="control-item"><kbd>ESC</kbd> <span>Pausar / Liberar mouse</span></div>
+        </div>
+      </div>
+
+      <div class="rules-note">
+        <strong>Reglas tácticas:</strong>
+        Cada zombi resiste exactamente 2 impactos. Usa <kbd>R</kbd> para recargar tu cargador desde tu reserva. Para obtener más balas debes recoger las <strong>cajas de suministros</strong> en el mapa. Si los zombis te tocan, te infligirán daño hasta infectarte.
+      </div>
+
+      <button id="btn-start" class="btn-primary" type="button">▶ &nbsp; INICIAR OPERACIÓN</button>
+    </div>
+  </div>
+
+  <!-- PANTALLA DE DERROTA (GAME OVER) -->
+  <div id="game-over-screen" class="overlay-screen">
+    <div class="dialog-box danger">
+      <h1 class="glitch-text">GAME OVER</h1>
+      <p class="summary-message">FUISTE ATRAPADO POR LOS INFECTADOS</p>
+      <div class="stats-summary" id="game-over-stats">
+        <span>Zombis neutralizados: <strong id="go-kills">0</strong></span>
+        <span>Munición consumida: <strong id="go-shots">0</strong></span>
+      </div>
+      <button id="btn-restart-go" class="btn-primary danger" type="button">↺ &nbsp; REINTENTAR MISIÓN</button>
+    </div>
+  </div>
+
+  <!-- PANTALLA DE VICTORIA -->
+  <div id="victory-screen" class="overlay-screen">
+    <div class="dialog-box success">
+      <div class="badge-success">OBJETIVO LOGRADO</div>
+      <h1>¡MISIÓN COMPLETADA!</h1>
+      <p class="summary-message">Has llegado con éxito a la zona de extracción.</p>
+      <div class="stats-summary" id="victory-stats">
+        <span>Zombis neutralizados: <strong id="vic-kills">0</strong></span>
+        <span>Disparos realizados: <strong id="vic-shots">0</strong></span>
+        <span>Cajas recolectadas: <strong id="vic-crates">0</strong></span>
+      </div>
+      <button id="btn-restart-vic" class="btn-primary success" type="button">↺ &nbsp; JUGAR DE NUEVO</button>
+    </div>
+  </div>
+
+</body>
+</html>

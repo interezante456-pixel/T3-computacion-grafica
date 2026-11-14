@@ -1,0 +1,550 @@
+/* ==========================================================================
+   Operación Extracción FPS 3D - Estilos CSS (UPN - Computación Gráfica)
+   Estética militar / sci-fi limpia, moderna y con acentos tácticos.
+   ========================================================================== */
+
+:root {
+  --bg-dark: #0a0e14;
+  --panel-bg: rgba(14, 22, 33, 0.88);
+  --border-color: rgba(90, 115, 140, 0.35);
+  --accent-gold: #ffc107;
+  --accent-green: #2ecc71;
+  --accent-red: #e74c3c;
+  --accent-blue: #3498db;
+  --text-primary: #f0f4f8;
+  --text-secondary: #94a3b8;
+  --font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+}
+
+#game-stage {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* --------------------------------------------------------------------------
+   MIRA TÁCTICA (CROSSHAIR)
+   -------------------------------------------------------------------------- */
+#crosshair {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.crosshair-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 4px;
+  height: 4px;
+  background: var(--accent-gold);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--accent-gold);
+}
+
+.crosshair-line {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.6);
+}
+
+.crosshair-line.top {
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 6px;
+  transform: translateX(-50%);
+}
+
+.crosshair-line.bottom {
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  height: 6px;
+  transform: translateX(-50%);
+}
+
+.crosshair-line.left {
+  left: 0;
+  top: 50%;
+  width: 6px;
+  height: 2px;
+  transform: translateY(-50%);
+}
+
+.crosshair-line.right {
+  right: 0;
+  top: 50%;
+  width: 6px;
+  height: 2px;
+  transform: translateY(-50%);
+}
+
+/* --------------------------------------------------------------------------
+   EFECTOS VISUALES EN PANTALLA (DESTELLO Y DAÑO)
+   -------------------------------------------------------------------------- */
+#muzzle-flash {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 65% 75%, rgba(255, 200, 100, 0.35) 0%, transparent 60%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.05s ease-out;
+  z-index: 5;
+}
+
+#muzzle-flash.active {
+  opacity: 1;
+}
+
+#damage-vignette {
+  position: fixed;
+  inset: 0;
+  box-shadow: inset 0 0 80px rgba(231, 76, 60, 0.85);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease-out;
+  z-index: 6;
+}
+
+#damage-vignette.active {
+  opacity: 1;
+}
+
+/* --------------------------------------------------------------------------
+   HUD: PARTE SUPERIOR
+   -------------------------------------------------------------------------- */
+.hud-top {
+  position: fixed;
+  top: 20px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.mission-info {
+  background: var(--panel-bg);
+  padding: 12px 20px;
+  border-radius: 8px;
+  border-left: 4px solid var(--accent-gold);
+  border-top: 1px solid var(--border-color);
+  backdrop-filter: blur(8px);
+}
+
+.hud-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: var(--accent-gold);
+  margin-bottom: 4px;
+}
+
+.mission-info h2 {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: #fff;
+}
+
+.zombie-counter {
+  background: var(--panel-bg);
+  padding: 12px 20px;
+  border-radius: 8px;
+  border-right: 4px solid var(--accent-red);
+  border-top: 1px solid var(--border-color);
+  text-align: right;
+  backdrop-filter: blur(8px);
+}
+
+.hud-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+}
+
+.hud-value {
+  font-size: 24px;
+  font-weight: 800;
+  color: #ff6b6b;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   HUD: PARTE INFERIOR
+   -------------------------------------------------------------------------- */
+.hud-bottom {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hud-card {
+  background: var(--panel-bg);
+  padding: 16px 22px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(8px);
+  min-width: 250px;
+}
+
+.health-card {
+  border-left: 5px solid var(--accent-green);
+}
+
+.hud-card-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.health-bar-container {
+  width: 100%;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.health-bar-fill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #2ecc71, #27ae60);
+  transition: width 0.25s ease-out;
+}
+
+.health-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-green);
+}
+
+/* Mensajes tácticos flotantes */
+.action-message {
+  padding: 10px 22px;
+  background: rgba(10, 14, 20, 0.9);
+  border: 1px solid var(--accent-gold);
+  border-radius: 20px;
+  color: var(--accent-gold);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.25s ease;
+  pointer-events: none;
+}
+
+.action-message.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.weapon-card {
+  border-right: 5px solid var(--accent-gold);
+  text-align: right;
+}
+
+.weapon-selector-hud {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.weapon-slot {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.weapon-slot.active {
+  background: var(--accent-gold);
+  color: #10141a;
+}
+
+.ammo-display {
+  display: flex;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.ammo-numbers {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ammo-current {
+  color: #fff;
+}
+
+.ammo-separator {
+  color: var(--text-secondary);
+  font-size: 24px;
+  margin: 0 2px;
+}
+
+.ammo-max {
+  color: var(--text-secondary);
+  font-size: 20px;
+}
+
+.ammo-icon {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--accent-gold);
+  letter-spacing: 1px;
+}
+
+/* --------------------------------------------------------------------------
+   PANTALLAS OVERLAY (INICIO, GAME OVER, VICTORIA)
+   -------------------------------------------------------------------------- */
+.overlay-screen {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 10, 15, 0.88);
+  backdrop-filter: blur(10px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  z-index: 100;
+}
+
+.overlay-screen.active {
+  display: flex;
+}
+
+.dialog-box {
+  background: #111823;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 36px 42px;
+  max-width: 620px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85);
+}
+
+.dialog-box.danger {
+  border-top: 6px solid var(--accent-red);
+}
+
+.dialog-box.success {
+  border-top: 6px solid var(--accent-green);
+}
+
+.badge-danger {
+  display: inline-block;
+  background: rgba(231, 76, 60, 0.18);
+  color: #ff6b6b;
+  border: 1px solid rgba(231, 76, 60, 0.35);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+}
+
+.badge-success {
+  display: inline-block;
+  background: rgba(46, 204, 113, 0.18);
+  color: #2ecc71;
+  border: 1px solid rgba(46, 204, 113, 0.35);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  color: var(--accent-gold);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+}
+
+.story-text {
+  color: #cbd5e1;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 14px 18px;
+  border-radius: 8px;
+  border-left: 3px solid var(--accent-blue);
+  text-align: left;
+}
+
+.controls-guide {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.control-item {
+  font-size: 13px;
+  color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+kbd {
+  background: #1e293b;
+  border: 1px solid #475569;
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--accent-gold);
+  box-shadow: 0 2px 0 #0f172a;
+}
+
+.rules-note {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 16px 24px;
+  background: var(--accent-gold);
+  color: #0b1118;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(255, 193, 7, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: #ffca2c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(255, 193, 7, 0.45);
+}
+
+.btn-primary.danger {
+  background: var(--accent-red);
+  color: #fff;
+  box-shadow: 0 4px 18px rgba(231, 76, 60, 0.35);
+}
+
+.btn-primary.danger:hover {
+  background: #f0503f;
+  box-shadow: 0 6px 24px rgba(231, 76, 60, 0.5);
+}
+
+.btn-primary.success {
+  background: var(--accent-green);
+  color: #fff;
+  box-shadow: 0 4px 18px rgba(46, 204, 113, 0.35);
+}
+
+.btn-primary.success:hover {
+  background: #34d678;
+  box-shadow: 0 6px 24px rgba(46, 204, 113, 0.5);
+}
+
+.summary-message {
+  font-size: 16px;
+  color: #e2e8f0;
+  margin-bottom: 20px;
+}
+
+.stats-summary {
+  display: flex;
+  justify-content: space-around;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 14px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.stats-summary strong {
+  color: #fff;
+  font-size: 15px;
+}
+
+/* Animación de fallo/alerta */
+@keyframes pulseRed {
+  0% { box-shadow: inset 0 0 40px rgba(231, 76, 60, 0.4); }
+  50% { box-shadow: inset 0 0 90px rgba(231, 76, 60, 0.9); }
+  100% { box-shadow: inset 0 0 40px rgba(231, 76, 60, 0.4); }
+}
+
+.dialog-box.danger {
+  animation: pulseRed 2s infinite ease-in-out;
+}

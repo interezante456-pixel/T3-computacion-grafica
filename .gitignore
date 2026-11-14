@@ -1,0 +1,10 @@
+# Dependencias y archivos temporales del sistema
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+
+# Entornos virtuales de Python
+venv/
+.venv/
+env/
